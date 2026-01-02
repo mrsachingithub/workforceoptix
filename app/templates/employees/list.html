@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Employees</h1>
+    {% if current_user and current_user.role == 'Admin' %}
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{{ url_for('employee.add_employee') }}" class="btn btn-sm btn-outline-primary">
+            <span data-feather="plus"></span>
+            Add Employee
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-sm">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Designation</th>
+                <th>Skills</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for emp in employees %}
+            <tr>
+                <td>{{ emp.id }}</td>
+                <td>
+                    <div class="fw-bold">{{ emp.name }}</div>
+                    <div class="text-muted small">{{ emp.email }}</div>
+                </td>
+                <td>{{ emp.designation }}</td>
+                <td><small>{{ emp.skills }}</small></td>
+                <td>
+                    <span
+                        class="badge {{ 'bg-success' if emp.availability_status == 'Active' else ('bg-danger' if emp.availability_status == 'Bench' else 'bg-warning') }}">
+                        {{ emp.availability_status }}
+                    </span>
+                </td>
+                <td>
+                    <a href="{{ url_for('employee.view_employee', id=emp.id) }}"
+                        class="btn btn-sm btn-outline-info me-1">View</a>
+                    <!-- Add Edit/Delete later -->
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

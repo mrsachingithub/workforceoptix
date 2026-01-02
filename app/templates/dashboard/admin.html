@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <h2 class="fw-bold">Executive Dashboard</h2>
+        <p class="text-muted">Overview of workforce utilization and bench status.</p>
+    </div>
+</div>
+
+<!-- Stats Row -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm bg-primary text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-1 opacity-75">Total Employees</h6>
+                        <h2 class="display-4 fw-bold mb-0">{{ stats.total_employees }}</h2>
+                    </div>
+                    <i class="bi bi-people-fill fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm bg-success text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-1 opacity-75">Utilization Rate</h6>
+                        <h2 class="display-4 fw-bold mb-0">{{ stats.utilization_rate }}%</h2>
+                    </div>
+                    <i class="bi bi-graph-up-arrow fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm bg-danger text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-uppercase mb-1 opacity-75">Bench Count</h6>
+                        <h2 class="display-4 fw-bold mb-0">{{ stats.bench_count }}</h2>
+                    </div>
+                    <i class="bi bi-hourglass-split fs-1 opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pending Approvals & Projects -->
+<div class="row">
+    <!-- Pending User Verification -->
+    <div class="col-md-6 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-warning text-dark py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-person-fill-exclamation me-2"></i>Pending Manager
+                        Verification</h5>
+                    <span class="badge bg-dark rounded-pill">{{ pending_users|length }}</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p_user in pending_users %}
+                            <tr>
+                                <td>{{ p_user.username }}</td>
+                                <td>{{ p_user.email }}</td>
+                                <td>
+                                    <a href="{{ url_for('dashboard.approve_user', user_id=p_user.id) }}"
+                                        class="btn btn-sm btn-success">
+                                        <i class="bi bi-check-lg"></i> Approve
+                                    </a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted py-3">No pending approvals.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Customer Projects -->
+    <div class="col-md-6 mb-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-info text-white py-3">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-briefcase-fill me-2"></i>Active Customer Projects</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Overview of active client engagements.</p>
+                <!-- We can list a few recent projects here or link to full list -->
+                <div class="list-group">
+                    <a href="{{ url_for('project.list_projects') }}"
+                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        View All Projects
+                        <span class="badge bg-primary rounded-pill">Manage</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold">Utilization Trends</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="utilizationChart" height="150"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold">Bench Distribution</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="benchChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Mock Data for Charts (Replace with API data later)
+    const ctxUtil = document.getElementById('utilizationChart').getContext('2d');
+    new Chart(ctxUtil, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Avg Utilization %',
+                data: [65, 70, 75, 72, 80, {{ stats.utilization_rate }}],
+            borderColor: '#0d6efd',
+            tension: 0.3,
+            fill: true,
+            backgroundColor: 'rgba(13, 110, 253, 0.1)'
+        }]
+    },
+        options: { responsive: true }
+    });
+
+    const ctxBench = document.getElementById('benchChart').getContext('2d');
+    new Chart(ctxBench, {
+        type: 'doughnut',
+        data: {
+            labels: ['Active', 'Bench'],
+            datasets: [{
+                data: [{{ stats.total_employees - stats.bench_count }}, {{ stats.bench_count }}],
+        backgroundColor: ['#198754', '#dc3545']
+    }]
+        },
+        options: { responsive: true }
+    });
+</script>
+{% endblock %}

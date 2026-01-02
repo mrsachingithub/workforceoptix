@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow border-0 mb-4">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h4 class="mb-0 fw-bold">{{ project.name }}</h4>
+                <a href="{{ url_for('project.list_projects') }}" class="btn btn-outline-secondary btn-sm">Back to
+                    List</a>
+            </div>
+            <div class="card-body p-4">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5 class="text-muted text-uppercase small ls-1">Client</h5>
+                        <p class="fs-5 fw-bold text-primary">{{ project.client_name }}</p>
+
+                        <h5 class="text-muted text-uppercase small ls-1 mt-3">Duration</h5>
+                        <p class="fw-semibold">
+                            {{ project.start_date }} <span class="text-muted mx-2">to</span> {{ project.end_date }}
+                        </p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <span
+                            class="badge {{ 'bg-success' if project.status == 'Active' else 'bg-secondary' }} fs-5 px-3 py-2">
+                            {{ project.status }}
+                        </span>
+                    </div>
+                </div>
+
+                <h5 class="border-bottom pb-2 mb-3">Required Skills</h5>
+                <div class="mb-4">
+                    {% if project.required_skills %}
+                    {% for skill in project.required_skills.split(',') %}
+                    <span class="badge bg-info-subtle text-info-emphasis me-1 mb-1">{{ skill.strip() }}</span>
+                    {% endfor %}
+                    {% else %}
+                    <span class="text-muted">No specific skills listed</span>
+                    {% endif %}
+                </div>
+
+                <h5 class="border-bottom pb-2 mb-3">Allocated Resources</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Employee</th>
+                                <th>Role/Designation</th>
+                                <th>Allocated Hours</th>
+                                <th>Dates</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for alloc in project.allocations %}
+                            <tr>
+                                <td>
+                                    <div class="fw-bold"><a
+                                            href="{{ url_for('employee.view_employee', id=alloc.employee.id) }}">{{
+                                            alloc.employee.name }}</a></div>
+                                    <div class="small text-muted">{{ alloc.employee.email }}</div>
+                                </td>
+                                <td>{{ alloc.employee.designation }}</td>
+                                <td>{{ alloc.allocated_hours }} / week</td>
+                                <td>{{ alloc.start_date }} - {{ alloc.end_date }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">No employees currently allocated.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

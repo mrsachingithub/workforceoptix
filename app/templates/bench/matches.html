@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-10 mx-auto">
+        <div class="card shadow border-0 mb-4">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="mb-0 fw-bold">Project Matches</h4>
+                    <span class="text-muted">for {{ employee.name }} ({{ employee.designation }})</span>
+                </div>
+                <a href="{{ url_for('bench.list_bench') }}" class="btn btn-outline-secondary btn-sm">Back to Bench</a>
+            </div>
+            <div class="card-body p-4">
+                <div class="mb-4">
+                    <h6 class="fw-bold">Employee Skills:</h6>
+                    {% for skill in employee.skills.split(',') %}
+                    <span class="badge bg-secondary me-1">{{ skill.strip() }}</span>
+                    {% endfor %}
+                </div>
+
+                <hr>
+
+                <h5 class="mb-3">Recommended Projects</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Match %</th>
+                                <th>Project Name</th>
+                                <th>Client</th>
+                                <th>Matched Skills</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for match in matches %}
+                            <tr>
+                                <td>
+                                    <div class="progress" style="height: 20px; width: 60px;">
+                                        <div class="progress-bar {{ 'bg-success' if match.match_percent > 80 else ('bg-warning' if match.match_percent > 50 else 'bg-danger') }}"
+                                            role="progressbar" style="width: {{ match.match_percent }}%"
+                                            aria-valuenow="{{ match.match_percent }}" aria-valuemin="0"
+                                            aria-valuemax="100">
+                                            {{ match.match_percent }}%
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><a href="{{ url_for('project.view_project', id=match.project.id) }}"
+                                        class="fw-bold text-decoration-none">{{ match.project.name }}</a></td>
+                                <td>{{ match.project.client_name }}</td>
+                                <td><small class="text-success">{{ match.matched_skills }}</small></td>
+                                <td>
+                                    <a href="{{ url_for('allocation.add_allocation', employee_id=employee.id, project_id=match.project.id) }}"
+                                        class="btn btn-sm btn-primary">
+                                        Allocate
+                                    </a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">
+                                    No suitable projects found based on skill matching logic. <br>
+                                    <small>Try updating employee skills or adding more projects.</small>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card border-0 shadow-sm bg-white">
+            <div class="card-body p-4">
+                <h2 class="fw-bold text-primary">Hello, {{ user.employee_profile.name if user.employee_profile else
+                    user.username }}!</h2>
+                <p class="text-muted mb-0">Here is your current project allocation status.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white fw-bold">My Status</div>
+            <div class="card-body text-center py-5">
+                {% if user.employee_profile %}
+                {% if user.employee_profile.availability_status == 'Bench' %}
+                <div class="display-1 text-danger mb-3"><i class="bi bi-pause-circle"></i></div>
+                <h4 class="fw-bold">On Bench</h4>
+                <p class="text-muted">You are currently available for new projects.</p>
+                {% else %}
+                <div class="display-1 text-success mb-3"><i class="bi bi-check-circle"></i></div>
+                <h4 class="fw-bold">{{ user.employee_profile.availability_status }}</h4>
+                <p class="text-muted">Keep up the good work!</p>
+                {% endif %}
+                {% else %}
+                <p class="text-warning">Profile not linked.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white fw-bold">Allocation History</div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Project</th>
+                                <th>Role/Skills</th>
+                                <th>Duration</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for alloc in allocations %}
+                            <tr>
+                                <td>{{ alloc.project.name }}</td>
+                                <td>{{ alloc.project.required_skills }}</td>
+                                <td>{{ alloc.start_date }} to {{ alloc.end_date }}</td>
+                                <td>
+                                    {% if alloc.project.status == 'Active' %}
+                                    <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Closed</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center">No allocations found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
