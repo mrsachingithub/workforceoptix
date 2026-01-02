@@ -70,9 +70,7 @@ WorkForceOptix is a comprehensive Workforce Management and Resource Allocation S
    ```bash
    python seed.py
    ```
-   *This will create a default admin user:*
-   - **Username:** `admin`
-   - **Password:** `admin123`
+   
 
 ## Running the Application
 
@@ -85,12 +83,6 @@ WorkForceOptix is a comprehensive Workforce Management and Resource Allocation S
    Open your browser and navigate to:
    `http://127.0.0.1:5000`
 
-## Configuration
-
-Environment variables can be set in a `.env` file or directly in the system.
-- `SECRET_KEY`: App secret key.
-- `DATABASE_URL`: Database connection string (defaults to local SQLite).
-- `JWT_SECRET_KEY`: Secret key for JWT tokens.
 
 ## License
 
