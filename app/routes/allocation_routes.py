@@ -67,3 +67,45 @@ def add_allocation():
     employees = Employee.query.all()
     projects = Project.query.filter_by(status='Active').all()
     return render_template('allocations/add.html', employees=employees, projects=projects)
+
+@allocation_bp.route('/edit/<int:allocation_id>', methods=['GET', 'POST'])
+@jwt_required()
+def edit_allocation(allocation_id):
+    alloc = Allocation.query.get_or_404(allocation_id)
+    
+    if request.method == 'POST':
+        alloc.employee_id = request.form.get('employee_id')
+        alloc.project_id = request.form.get('project_id')
+        alloc.allocated_hours = int(request.form.get('allocated_hours'))
+        start_date_str = request.form.get('start_date')
+        end_date_str = request.form.get('end_date')
+        
+        alloc.start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+        alloc.end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+        
+        db.session.commit()
+        
+        # Update Status
+        update_employee_status(alloc.employee_id)
+        
+        flash('Allocation updated successfully', 'success')
+        return redirect(url_for('allocation.list_allocations'))
+        
+    employees = Employee.query.all()
+    projects = Project.query.filter_by(status='Active').all()
+    return render_template('allocations/edit.html', allocation=alloc, employees=employees, projects=projects)
+
+@allocation_bp.route('/delete/<int:allocation_id>', methods=['POST'])
+@jwt_required()
+def delete_allocation(allocation_id):
+    alloc = Allocation.query.get_or_404(allocation_id)
+    emp_id = alloc.employee_id
+    
+    db.session.delete(alloc)
+    db.session.commit()
+    
+    # Update Status
+    update_employee_status(emp_id)
+    
+    flash('Allocation deleted successfully', 'success')
+    return redirect(url_for('allocation.list_allocations'))

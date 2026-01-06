@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash
+from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app import db
 from app.models import User, Employee, Allocation
@@ -56,9 +56,32 @@ def employee_dashboard(user):
     emp_id = user.employee_profile.id
     today = datetime.today().date()
     today = datetime.today().date()
-    my_allocations = Allocation.query.filter(Allocation.employee_id == emp_id).all()
+    my_allocations = Allocation.query.filter(Allocation.employee_id == emp_id).order_by(Allocation.end_date.desc()).all()
     
     return render_template('dashboard/employee.html', user=user, allocations=my_allocations)
+
+@dashboard_bp.route('/link_profile', methods=['POST'])
+@jwt_required()
+def link_profile():
+    current_user_id = get_jwt_identity()
+    user = User.query.get(current_user_id)
+    
+    email = request.form.get('email')
+    
+    if not email:
+        flash('Please enter an email address.', 'danger')
+        return redirect(url_for('dashboard.index'))
+        
+    employee = Employee.query.filter_by(email=email).first()
+    
+    if employee:
+        user.employee_id = employee.id
+        db.session.commit()
+        flash(f'Successfully linked to employee profile: {employee.name}', 'success')
+    else:
+        flash('No employee found with that email address.', 'danger')
+        
+    return redirect(url_for('dashboard.index'))
 
 @dashboard_bp.route('/approve_user/<int:user_id>')
 @jwt_required()

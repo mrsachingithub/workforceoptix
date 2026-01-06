@@ -30,6 +30,13 @@
                 {% endif %}
                 {% else %}
                 <p class="text-warning">Profile not linked.</p>
+                <form action="{{ url_for('dashboard.link_profile') }}" method="POST" class="mt-3">
+                    <div class="mb-3">
+                        <input type="email" name="email" class="form-control" placeholder="Enter your work email"
+                            required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Link Profile</button>
+                </form>
                 {% endif %}
             </div>
         </div>

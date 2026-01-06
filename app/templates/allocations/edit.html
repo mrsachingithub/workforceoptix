@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h4 class="mb-0">Edit Allocation</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="employee_id" class="form-label">Employee</label>
+                        <select class="form-select" id="employee_id" name="employee_id" required>
+                            <option value="">Select Employee</option>
+                            {% for emp in employees %}
+                            <option value="{{ emp.id }}" {% if emp.id==allocation.employee_id %}selected{% endif %}>{{
+                                emp.name }} ({{ emp.availability_status }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="project_id" class="form-label">Project</label>
+                        <select class="form-select" id="project_id" name="project_id" required>
+                            <option value="">Select Project</option>
+                            {% for proj in projects %}
+                            <option value="{{ proj.id }}" {% if proj.id==allocation.project_id %}selected{% endif %}>{{
+                                proj.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="allocated_hours" class="form-label">Allocated Hours (Weekly)</label>
+                        <input type="number" class="form-control" id="allocated_hours" name="allocated_hours" min="1"
+                            max="40" value="{{ allocation.allocated_hours }}" required>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col">
+                            <label for="start_date" class="form-label">Start Date</label>
+                            <input type="date" class="form-control" id="start_date" name="start_date"
+                                value="{{ allocation.start_date }}" required>
+                        </div>
+                        <div class="col">
+                            <label for="end_date" class="form-label">End Date</label>
+                            <input type="date" class="form-control" id="end_date" name="end_date"
+                                value="{{ allocation.end_date }}" required>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('allocation.list_allocations') }}"
+                            class="btn btn-secondary me-md-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Update Allocation</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
