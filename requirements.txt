@@ -4,3 +4,5 @@ Flask-Migrate
 Flask-JWT-Extended
 python-dotenv
 email_validator
+gunicorn
+psycopg2-binary

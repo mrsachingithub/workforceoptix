@@ -3,14 +3,15 @@ from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
 class User(db.Model):
+    __tablename__ = 'workforce_users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True, nullable=False)
+    employee_id = db.Column(db.Integer, db.ForeignKey('workforce_employees.id'), nullable=True) # Updated FK
     email = db.Column(db.String(120), index=True, unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
     role = db.Column(db.String(20), default='Employee') # Admin, Manager, Employee
     is_verified = db.Column(db.Boolean, default=False)
-    # Link to Employee profile if applicable
-    employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'), nullable=True)
+
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -28,6 +29,7 @@ class User(db.Model):
         }
 
 class Employee(db.Model):
+    __tablename__ = 'workforce_employees'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -74,6 +76,7 @@ class Employee(db.Model):
         }
 
 class Project(db.Model):
+    __tablename__ = 'workforce_projects'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=False)
     client_name = db.Column(db.String(64), nullable=False)
@@ -96,9 +99,10 @@ class Project(db.Model):
         }
 
 class Allocation(db.Model):
+    __tablename__ = 'workforce_allocations'
     id = db.Column(db.Integer, primary_key=True)
-    employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'), nullable=False)
-    project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
+    employee_id = db.Column(db.Integer, db.ForeignKey('workforce_employees.id'), nullable=False)
+    project_id = db.Column(db.Integer, db.ForeignKey('workforce_projects.id'), nullable=False)
     allocated_hours = db.Column(db.Integer, default=40) # Hours per week
     start_date = db.Column(db.Date)
     end_date = db.Column(db.Date)
