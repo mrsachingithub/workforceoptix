@@ -8,7 +8,7 @@ class User(db.Model):
     username = db.Column(db.String(64), index=True, unique=True, nullable=False)
     employee_id = db.Column(db.Integer, db.ForeignKey('workforce_employees.id'), nullable=True) # Updated FK
     email = db.Column(db.String(120), index=True, unique=True, nullable=False)
-    password_hash = db.Column(db.String(128))
+    password_hash = db.Column(db.String(256))
     role = db.Column(db.String(20), default='Employee') # Admin, Manager, Employee
     is_verified = db.Column(db.Boolean, default=False)
 
