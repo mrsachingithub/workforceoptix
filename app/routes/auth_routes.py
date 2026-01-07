@@ -24,7 +24,7 @@ def login():
                  # For normal users, check flag.
                  return jsonify({"msg": "Account pending verification by Manager."}), 403
             
-            access_token = create_access_token(identity=user.id)
+            access_token = create_access_token(identity=str(user.id))
             resp = jsonify({'login': True, 'token': access_token})
             set_access_cookies(resp, access_token)
             return resp, 200
